@@ -1,7 +1,12 @@
 import React from "react";
+import Main from "./pages/Main";
 
 function App() {
-  return <div className="App">홈쇼핑모아 클론코딩 시작</div>;
+  return (
+    <div className="App">
+      <Main />
+    </div>
+  );
 }
 
 export default App;
