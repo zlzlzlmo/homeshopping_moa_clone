@@ -1,11 +1,13 @@
 import React from "react";
+import MainSection from "../components/MainSection";
 import Nav from "../components/Nav";
 
 const Main = () => {
   return (
-    <div>
+    <>
       <Nav />
-    </div>
+      <MainSection />
+    </>
   );
 };
 
