@@ -65,7 +65,7 @@ const Nav = () => {
   );
 };
 
-const Container = styled.div`
+const Container = styled.nav`
   width: 100%;
   margin: 0 auto;
   border-bottom: 1px solid #bbb;
@@ -77,11 +77,10 @@ const Container = styled.div`
   background-color: #fff;
 `;
 
-const NavContainer = styled.nav`
+const NavContainer = styled.div`
   height: 76px;
   min-width: 900px;
   max-width: 1200px;
-
   margin: 0 auto;
   display: flex;
   align-items: center;

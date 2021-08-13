@@ -10,6 +10,7 @@ import {
   todayToString,
 } from "./util/date";
 import { categoryList, companyImg } from "../data/data";
+import Product from "./Product";
 
 const MainSection = () => {
   const [dateRange, setDateRange] = useState<string[]>([]);
@@ -30,18 +31,12 @@ const MainSection = () => {
     setQueryStringParameter("cate", cate);
     setClickCategory(index + 1);
   };
-  useEffect(() => {
-    const parsed = queryString.parse(window.location.search);
 
-    dayjs.locale("ko");
-    let today = parseInt(dayjs().format("YYYYMMDD"));
-    let newDateRange = Array.from({ length: 11 }, (v, i) =>
-      todayToString(today + i - 5)
-    );
-    setDateRange(newDateRange);
-
-    //쿼리스트링 데이트 받아와서 필터 적용
-    let dateFromQuery =
+  const setFilterIndexFromQueryString = (
+    newDateRange: string[],
+    parsed: queryString.ParsedQuery<string>
+  ) => {
+    const dateFromQuery =
       newDateRange.indexOf(todayToString(Number(parsed.date))) + 1;
     setClickDateIdx(dateFromQuery);
 
@@ -54,9 +49,31 @@ const MainSection = () => {
       return item["type"] === parsed.cate;
     });
     setClickCategory(categoryFromQuery + 1);
+  };
+
+  useEffect(() => {
+    const parsed = queryString.parse(window.location.search);
+
+    // console.log(window.location.search);
+    dayjs.locale("ko");
+    let today = parseInt(dayjs().format("YYYYMMDD"));
+    let newDateRange = Array.from({ length: 11 }, (v, i) =>
+      todayToString(today + i - 5)
+    );
+    setDateRange(newDateRange);
+
+    setFilterIndexFromQueryString(newDateRange, parsed);
   }, []);
+
+  const testArray = Array.from({ length: 400 }, () => {});
+  console.log(testArray);
   return (
     <Container>
+      <LeftSection>
+        {testArray.map(() => (
+          <Product></Product>
+        ))}
+      </LeftSection>
       <RightSection>
         <RightSectionFixed>
           <Title>편성표 날짜 선택</Title>
@@ -132,16 +149,21 @@ const MainSection = () => {
   );
 };
 
-const Container = styled.nav`
+const Container = styled.div`
   min-width: 900px;
   max-width: 1200px;
   margin: 0 auto;
+  display: flex;
 `;
-const RightSection = styled.div`
+
+const LeftSection = styled.section`
+  padding-top: 20px;
+`;
+const RightSection = styled.section`
   margin-left: auto;
   width: 311px;
   height: 100vh;
-  border-left: 1px solid black;
+  border-left: 1px solid #ddd;
   position: relative;
 `;
 
