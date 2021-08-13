@@ -11,16 +11,23 @@ import {
 } from "./util/date";
 import { categoryList, companyImg } from "../data/data";
 import Product from "./Product";
-
+import { getProductsFromMoa } from "./util/product";
+import { useAppDispatch } from "../redux/configStore";
+import { setProduct } from "../redux/modules/product";
 const MainSection = () => {
   const [dateRange, setDateRange] = useState<string[]>([]);
   const [clickDateIdx, setClickDateIdx] = useState<number>(0);
   const [clickShoppingCompany, setClickShoppingCompany] = useState<number>(0);
   const [clickCategory, setClickCategory] = useState<number>(0);
+
+  const dispatch = useAppDispatch();
   const handleClickDate = (date: string, index: number) => {
     const noHypeDate = deleteHypenFromDate(date);
     setQueryStringParameter("date", noHypeDate);
     setClickDateIdx(index + 1);
+    getProductsFromMoa(noHypeDate).then((result) => {
+      dispatch(setProduct(result));
+    });
   };
   const handleClickShoppingCompany = (company: string, index: number) => {
     setQueryStringParameter("site", company);
@@ -66,13 +73,11 @@ const MainSection = () => {
   }, []);
 
   const testArray = Array.from({ length: 400 }, () => {});
-  console.log(testArray);
+
   return (
     <Container>
       <LeftSection>
-        {testArray.map(() => (
-          <Product></Product>
-        ))}
+        <Product></Product>
       </LeftSection>
       <RightSection>
         <RightSectionFixed>
