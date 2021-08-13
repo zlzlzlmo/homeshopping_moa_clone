@@ -4,14 +4,25 @@ import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
 import queryString from "query-string";
-import { todayToString } from "./util/data";
+import {
+  deleteHypenFromDate,
+  setQueryStringParameter,
+  todayToString,
+} from "./util/date";
 
 const MainSection = () => {
   const [dateRange, setDateRange] = useState<string[]>([]);
   const [clickDateIdx, setClickDateIdx] = useState<number>(0);
-  const parsed = queryString.parse(window.location.search);
 
+  const handleClickDate = (date: string, index: number) => {
+    const noHypeDate = deleteHypenFromDate(date);
+    setQueryStringParameter("date", noHypeDate);
+    setClickDateIdx(index + 1);
+  };
   useEffect(() => {
+    // window.location.search = "ㅇㅇ";
+    const parsed = queryString.parse(window.location.search);
+
     dayjs.locale("ko");
     let today = parseInt(dayjs().format("YYYYMMDD"));
     let newDateRange = Array.from({ length: 11 }, (v, i) =>
@@ -42,7 +53,7 @@ const MainSection = () => {
                     clickDateIdx={clickDateIdx}
                     today
                     key={index}
-                    onClick={() => setClickDateIdx(index + 1)}
+                    onClick={() => handleClickDate(item, index)}
                   >
                     {dayjs(item).format("M월D일 (오늘)")}
                   </Date>
@@ -53,7 +64,7 @@ const MainSection = () => {
                   clickDateIdx={clickDateIdx}
                   today={false}
                   key={index}
-                  onClick={() => setClickDateIdx(index + 1)}
+                  onClick={() => handleClickDate(item, index)}
                 >
                   {dayjs(item).format("M월D일 (ddd)")}
                 </Date>
