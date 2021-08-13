@@ -16,56 +16,72 @@ const Nav = () => {
     }, 3000);
   }, []);
   return (
-    <NavContainer>
-      <Logo />
-      <SearchBox>
-        <SearchInput placeholder="홈쇼핑 상품 검색" />
-        <SearchIcon />
-      </SearchBox>
-      <SearchRankGrid
-        onMouseEnter={() => setRankPopShow(true)}
-        onMouseLeave={() => setRankPopShow(false)}
-      >
-        <SearchRankContainer>
-          <SearchRankWrapper searchBottom={searchBottom}>
+    <Container>
+      <NavContainer>
+        <Logo />
+        <SearchBox>
+          <SearchInput placeholder="홈쇼핑 상품 검색" />
+          <SearchIcon />
+        </SearchBox>
+        <SearchRankGrid
+          onMouseEnter={() => setRankPopShow(true)}
+          onMouseLeave={() => setRankPopShow(false)}
+        >
+          <SearchRankContainer>
+            <SearchRankWrapper searchBottom={searchBottom}>
+              {search_rank.map(({ word, hits }, index) => (
+                <SearchRank key={index}>
+                  <div>
+                    <span className="rank">{index + 1}.</span>
+                    <span className="word">{word}</span>
+                    <span className="count">
+                      {hits}
+                      <span> hits</span>
+                    </span>
+                  </div>
+                </SearchRank>
+              ))}
+            </SearchRankWrapper>
+          </SearchRankContainer>
+          <RankPopUpBox rankPopShow={rankPopShow}>
+            <div className="title">인기검색어</div>
             {search_rank.map(({ word, hits }, index) => (
-              <SearchRank key={index}>
-                <div>
-                  <span className="rank">{index + 1}.</span>
-                  <span className="word">{word}</span>
-                  <span className="count">
-                    {hits}
-                    <span> hits</span>
-                  </span>
-                </div>
-              </SearchRank>
+              <div className="query_real_time">
+                <span className="rank">{index + 1}.</span>
+                <span className="word">{word}</span>
+                <span className="count">
+                  {hits}
+                  <span> hits</span>
+                </span>
+              </div>
             ))}
-          </SearchRankWrapper>
-        </SearchRankContainer>
-        <RankPopUpBox rankPopShow={rankPopShow}>
-          <div className="title">인기검색어</div>
-          {search_rank.map(({ word, hits }, index) => (
-            <div className="query_real_time">
-              <span className="rank">{index + 1}.</span>
-              <span className="word">{word}</span>
-              <span className="count">
-                {hits}
-                <span> hits</span>
-              </span>
-            </div>
-          ))}
-        </RankPopUpBox>
-      </SearchRankGrid>
-      <Ad>
-        <img src="http://hsmoa.com/media/img/web/ad_button.png" alt="" />
-      </Ad>
-    </NavContainer>
+          </RankPopUpBox>
+        </SearchRankGrid>
+        <Ad>
+          <img src="http://hsmoa.com/media/img/web/ad_button.png" alt="" />
+        </Ad>
+      </NavContainer>
+    </Container>
   );
 };
 
+const Container = styled.div`
+  width: 100%;
+  margin: 0 auto;
+  border-bottom: 1px solid #bbb;
+  box-shadow: 0 0px 4px rgb(0 0 0 / 15%);
+  z-index: 999;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background-color: #fff;
+`;
+
 const NavContainer = styled.nav`
   height: 76px;
-  width: 100%;
+  min-width: 900px;
+  max-width: 1200px;
+
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -180,6 +196,8 @@ const RankPopUpBox = styled.div<RankPopUpBoxType>`
   box-sizing: border-box;
   border: 1px solid black;
   padding: 3px 6px;
+  background-color: #fff;
+
   .title {
     font-size: 13px;
     margin: 7px;
