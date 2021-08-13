@@ -5,6 +5,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/ko";
 const MainSection = () => {
   const [dateRange, setDateRange] = useState<string[]>([]);
+  const [clickDateIdx, setClickDateIdx] = useState<number>(0);
   useEffect(() => {
     dayjs.locale("ko");
     let today = parseInt(dayjs().format("YYYYMMDD"));
@@ -32,13 +33,23 @@ const MainSection = () => {
             {dateRange.map((item, index) => {
               if (item === dayjs().format("YYYY-MM-DD")) {
                 return (
-                  <Date today key={index}>
+                  <Date
+                    clickDateIdx={clickDateIdx}
+                    today
+                    key={index}
+                    onClick={() => setClickDateIdx(index + 1)}
+                  >
                     {dayjs(item).format("M월D일 (오늘)")}
                   </Date>
                 );
               }
               return (
-                <Date today={false} key={index}>
+                <Date
+                  clickDateIdx={clickDateIdx}
+                  today={false}
+                  key={index}
+                  onClick={() => setClickDateIdx(index + 1)}
+                >
                   {dayjs(item).format("M월D일 (ddd)")}
                 </Date>
               );
@@ -82,11 +93,20 @@ const DatePick = styled.div`
 
 type DateType = {
   today: boolean;
+  clickDateIdx: number;
 };
 const Date = styled.div<DateType>`
   text-align: center;
   font-size: ${({ today }) => (today ? "13px" : "12px")};
   color: ${({ today }) => (today ? "#45ADA6" : "#000")};
+
+  ${({ clickDateIdx }) =>
+    clickDateIdx &&
+    `&:nth-child(${clickDateIdx}) {
+        background-color:#E2404F;
+        color:#fff;
+  }`};
+
   padding: 9px 0;
   border-bottom: 1px solid #eee;
   &:nth-child(3n + 1),
