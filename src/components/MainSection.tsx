@@ -3,26 +3,26 @@ import styled from "styled-components";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
+import queryString from "query-string";
+import { todayToString } from "./util/data";
+
 const MainSection = () => {
   const [dateRange, setDateRange] = useState<string[]>([]);
   const [clickDateIdx, setClickDateIdx] = useState<number>(0);
+  const parsed = queryString.parse(window.location.search);
+
   useEffect(() => {
     dayjs.locale("ko");
     let today = parseInt(dayjs().format("YYYYMMDD"));
-    const todayToString = (date: number) => {
-      const todayString = date.toString();
-      const toString =
-        todayString.slice(0, 4) +
-        "-" +
-        todayString.slice(4, 6) +
-        "-" +
-        todayString.slice(6, 8);
-      return toString;
-    };
-    let newDataRange = Array.from({ length: 11 }, (v, i) =>
+    let newDateRange = Array.from({ length: 11 }, (v, i) =>
       todayToString(today + i - 5)
     );
-    setDateRange(newDataRange);
+    setDateRange(newDateRange);
+
+    //쿼리스트링 데이트 받아와서 필터 적용
+    let dateFromQuery =
+      newDateRange.indexOf(todayToString(Number(parsed.date))) + 1;
+    setClickDateIdx(dateFromQuery);
   }, []);
   return (
     <Container>
@@ -31,6 +31,11 @@ const MainSection = () => {
           <Title>편성표 날짜 선택</Title>
           <DatePick>
             {dateRange.map((item, index) => {
+              //   if (parsed.date) {
+              //     todayToString(Number(parsed.date)) === item &&
+              //       console.log("item : ", item);
+              //   }
+
               if (item === dayjs().format("YYYY-MM-DD")) {
                 return (
                   <Date
@@ -99,7 +104,7 @@ const Date = styled.div<DateType>`
   text-align: center;
   font-size: ${({ today }) => (today ? "13px" : "12px")};
   color: ${({ today }) => (today ? "#45ADA6" : "#000")};
-
+  cursor: pointer;
   ${({ clickDateIdx }) =>
     clickDateIdx &&
     `&:nth-child(${clickDateIdx}) {
