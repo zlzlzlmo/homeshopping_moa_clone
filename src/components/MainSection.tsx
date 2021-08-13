@@ -12,8 +12,8 @@ import {
 import { categoryList, companyImg } from "../data/data";
 import Product from "./Product";
 import { getProductsFromMoa } from "./util/product";
-import { useAppDispatch } from "../redux/configStore";
-import { setProduct } from "../redux/modules/product";
+import { useAppDispatch, useAppSelector } from "../redux/configStore";
+import { setProduct, getProducts } from "../redux/modules/product";
 const MainSection = () => {
   const [dateRange, setDateRange] = useState<string[]>([]);
   const [clickDateIdx, setClickDateIdx] = useState<number>(0);
@@ -21,6 +21,8 @@ const MainSection = () => {
   const [clickCategory, setClickCategory] = useState<number>(0);
 
   const dispatch = useAppDispatch();
+  const products = useAppSelector(getProducts);
+  console.log("products : ", products);
   const handleClickDate = (date: string, index: number) => {
     const noHypeDate = deleteHypenFromDate(date);
     setQueryStringParameter("date", noHypeDate);
@@ -77,7 +79,9 @@ const MainSection = () => {
   return (
     <Container>
       <LeftSection>
-        <Product></Product>
+        {products.map((item, index) => (
+          <Product key={index} item={item}></Product>
+        ))}
       </LeftSection>
       <RightSection>
         <RightSectionFixed>

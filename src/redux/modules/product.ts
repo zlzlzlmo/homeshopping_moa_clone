@@ -12,5 +12,5 @@ const productSlice = createSlice({
   },
 });
 export const { setProduct } = productSlice.actions;
-const getProducts = (state: RootState) => state.product;
+export const getProducts = (state: RootState) => state.product;
 export default productSlice.reducer;

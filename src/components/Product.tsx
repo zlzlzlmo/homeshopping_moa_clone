@@ -1,13 +1,13 @@
 import React from "react";
 import styled from "styled-components";
-const Product = () => {
+interface ProductProps {
+  item: any;
+}
+const Product: React.FC<ProductProps> = ({ item }) => {
   return (
     <Container>
       <ImageBox>
-        <img
-          src="http://thum.buzzni.com/unsafe/320x320/center/smart/http://cdn.image.buzzni.com/2021/04/18/pp04Qt5cEk.jpg"
-          alt="/"
-        />
+        <img src={item.image} alt="/" />
       </ImageBox>
       <ContentBox>
         <CompanyAndTimeBox>
@@ -16,10 +16,12 @@ const Product = () => {
             alt=""
           />
           <span className="divider"> | </span>
-          <span className="time">0시 00분 ~ 1시 00분</span>
+          <span className="time">
+            {item.time.start} ~ {item.time.end}
+          </span>
         </CompanyAndTimeBox>
-        <Title>이다희 스키니랩 행복한 시서스 다이어트 8주+8주, 16주분</Title>
-        <Price>49,900원</Price>
+        <Title>{item.title}</Title>
+        <Price>{item.price}</Price>
       </ContentBox>
     </Container>
   );
