@@ -11,6 +11,41 @@ export const search_rank = [
   { word: "냉장고", hits: 14 },
 ];
 
+export const categoryList = [
+  {
+    type: "",
+    title: "전체보기",
+  },
+  {
+    type: "생활·주방",
+    title: "생활·주방",
+  },
+  {
+    type: "가전·디지털",
+    title: "가전·디지털",
+  },
+  {
+    type: "화장품·미용",
+    title: "화장품·미용",
+  },
+  {
+    type: "패션·잡화",
+    title: "패션·잡화",
+  },
+  {
+    type: "유아·아동",
+    title: "유아·아동",
+  },
+  {
+    type: "여행·레저",
+    title: "식품·건강",
+  },
+  {
+    type: "보험",
+    title: "보험",
+  },
+];
+
 export const companyImg = [
   {
     type: "",

@@ -9,12 +9,13 @@ import {
   setQueryStringParameter,
   todayToString,
 } from "./util/date";
-import { companyImg } from "../data/search";
+import { categoryList, companyImg } from "../data/data";
 
 const MainSection = () => {
   const [dateRange, setDateRange] = useState<string[]>([]);
   const [clickDateIdx, setClickDateIdx] = useState<number>(0);
   const [clickShoppingCompany, setClickShoppingCompany] = useState<number>(0);
+  const [clickCategory, setClickCategory] = useState<number>(0);
   const handleClickDate = (date: string, index: number) => {
     const noHypeDate = deleteHypenFromDate(date);
     setQueryStringParameter("date", noHypeDate);
@@ -23,6 +24,11 @@ const MainSection = () => {
   const handleClickShoppingCompany = (company: string, index: number) => {
     setQueryStringParameter("site", company);
     setClickShoppingCompany(index + 1);
+  };
+
+  const handleClickCategory = (cate: string, index: number) => {
+    setQueryStringParameter("cate", cate);
+    setClickCategory(index + 1);
   };
   useEffect(() => {
     const parsed = queryString.parse(window.location.search);
@@ -43,6 +49,11 @@ const MainSection = () => {
       return item["type"] === parsed.site;
     });
     setClickShoppingCompany(shoppingCompanyFromQuery + 1);
+
+    const categoryFromQuery = categoryList.findIndex((item, i) => {
+      return item["type"] === parsed.cate;
+    });
+    setClickCategory(categoryFromQuery + 1);
   }, []);
   return (
     <Container>
@@ -100,6 +111,21 @@ const MainSection = () => {
               );
             })}
           </DatePick>
+          <Title>카테고리 선택</Title>
+
+          <DatePick>
+            {categoryList.map(({ title, type }, index) => {
+              return (
+                <Category
+                  key={index}
+                  clickCategory={clickCategory}
+                  onClick={() => handleClickCategory(type, index)}
+                >
+                  {title}
+                </Category>
+              );
+            })}
+          </DatePick>
         </RightSectionFixed>
       </RightSection>
     </Container>
@@ -151,9 +177,25 @@ const BorderInDiv = css`
   cursor: pointer;
   text-align: center;
 `;
+
+const ClickedStatus = css`
+  &:after {
+    content: "";
+    width: 18px;
+    height: 18px;
+    background: url(http://hsmoa.com/media/img/mobile/check_mark_on.png)
+      no-repeat 50% 50%;
+    background-size: 18px 18px;
+    z-index: 9;
+    position: absolute;
+    right: 2px;
+    top: 2px;
+  }
+  background-color: #f5f5f5 !important;
+`;
 const Date = styled.div<DateType>`
   font-size: ${({ today }) => (today ? "13px" : "12px")};
-  color: ${({ today }) => (today ? "#45ADA6" : "#000")};
+  color: ${({ today }) => (today ? "#45ADA6" : "#666")};
   ${({ clickDateIdx }) =>
     clickDateIdx &&
     `&:nth-child(${clickDateIdx}) {
@@ -171,7 +213,6 @@ type ShoppingCompanyType = {
 };
 const ShoppingCompany = styled.div<ShoppingCompanyType>`
   height: 38px;
-
   ${BorderInDiv}
   ${({ image }) =>
     image
@@ -185,19 +226,24 @@ const ShoppingCompany = styled.div<ShoppingCompanyType>`
   ${({ clickShoppingCompany }) =>
     clickShoppingCompany &&
     `&:nth-child(${clickShoppingCompany}) {
-          &:after {
-            content: "";
-            width: 18px;
-            height: 18px;
-            background: url(http://hsmoa.com/media/img/mobile/check_mark_on.png)
-            no-repeat 50% 50%;
-            background-size: 18px 18px;
-            z-index: 9;
-            position: absolute;
-            right: 2px;
-            top: 2px;
-        }
-    background-color: #f5f5f5 !important;
+          ${ClickedStatus}
+  }`};
+`;
+
+type CategoryType = {
+  clickCategory: number;
+};
+const Category = styled.div<CategoryType>`
+  ${BorderInDiv}
+  line-height : 36px;
+  font-size: 14px;
+  color: #666;
+  position: relative;
+
+  ${({ clickCategory }) =>
+    clickCategory &&
+    `&:nth-child(${clickCategory}) {
+          ${ClickedStatus}
   }`};
 `;
 export default MainSection;

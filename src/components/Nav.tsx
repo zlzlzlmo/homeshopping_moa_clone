@@ -2,7 +2,7 @@ import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
 import styled from "styled-components";
-import { search_rank } from "../data/search";
+import { search_rank } from "../data/data";
 const Nav = () => {
   const [searchBottom, setSearchBottom] = useState<string>("0%");
   const [rankPopShow, setRankPopShow] = useState<boolean>(false);
