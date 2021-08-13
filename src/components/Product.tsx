@@ -11,10 +11,7 @@ const Product: React.FC<ProductProps> = ({ item }) => {
       </ImageBox>
       <ContentBox>
         <CompanyAndTimeBox>
-          <img
-            src="http://cache.m.ui.hsmoa.com/media/hsmoa/logo/logo_gsshop.png"
-            alt=""
-          />
+          <img src={item.company_logo} alt="" />
           <span className="divider"> | </span>
           <span className="time">
             {item.time.start} ~ {item.time.end}

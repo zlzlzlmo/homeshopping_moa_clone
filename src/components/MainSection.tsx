@@ -45,9 +45,13 @@ const MainSection = () => {
     newDateRange: string[],
     parsed: queryString.ParsedQuery<string>
   ) => {
-    const dateFromQuery =
-      newDateRange.indexOf(todayToString(Number(parsed.date))) + 1;
-    setClickDateIdx(dateFromQuery);
+    if (parsed.date !== undefined) {
+      const dateFromQuery =
+        newDateRange.indexOf(todayToString(Number(parsed.date))) + 1;
+      setClickDateIdx(dateFromQuery);
+    } else {
+      setClickDateIdx(6);
+    }
 
     const shoppingCompanyFromQuery = companyImg.findIndex((item, i) => {
       return item["type"] === parsed.site;
@@ -61,9 +65,20 @@ const MainSection = () => {
   };
 
   useEffect(() => {
+    const aa = companyImg.find((item) => {
+      return item.type === "gsmyshop";
+    });
+    console.log("aa : ", aa?.style);
     const parsed = queryString.parse(window.location.search);
 
     // console.log(window.location.search);
+    if (parsed.date !== null) {
+      getProductsFromMoa(parsed.date as string).then((result) => {
+        dispatch(setProduct(result));
+      });
+    }
+
+    console.log("dd  :");
     dayjs.locale("ko");
     let today = parseInt(dayjs().format("YYYYMMDD"));
     let newDateRange = Array.from({ length: 11 }, (v, i) =>
