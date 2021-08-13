@@ -46,7 +46,7 @@ const Nav = () => {
           <RankPopUpBox rankPopShow={rankPopShow}>
             <div className="title">인기검색어</div>
             {search_rank.map(({ word, hits }, index) => (
-              <div className="query_real_time">
+              <div className="query_real_time" key={index}>
                 <span className="rank">{index + 1}.</span>
                 <span className="word">{word}</span>
                 <span className="count">

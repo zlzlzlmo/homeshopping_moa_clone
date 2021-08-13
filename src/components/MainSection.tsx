@@ -1,5 +1,5 @@
 import React from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
@@ -9,18 +9,22 @@ import {
   setQueryStringParameter,
   todayToString,
 } from "./util/date";
+import { companyImg } from "../data/search";
 
 const MainSection = () => {
   const [dateRange, setDateRange] = useState<string[]>([]);
   const [clickDateIdx, setClickDateIdx] = useState<number>(0);
-
+  const [clickShoppingCompany, setClickShoppingCompany] = useState<number>(0);
   const handleClickDate = (date: string, index: number) => {
     const noHypeDate = deleteHypenFromDate(date);
     setQueryStringParameter("date", noHypeDate);
     setClickDateIdx(index + 1);
   };
+  const handleClickShoppingCompany = (company: string, index: number) => {
+    setQueryStringParameter("site", company);
+    setClickShoppingCompany(index + 1);
+  };
   useEffect(() => {
-    // window.location.search = "ㅇㅇ";
     const parsed = queryString.parse(window.location.search);
 
     dayjs.locale("ko");
@@ -34,6 +38,11 @@ const MainSection = () => {
     let dateFromQuery =
       newDateRange.indexOf(todayToString(Number(parsed.date))) + 1;
     setClickDateIdx(dateFromQuery);
+
+    const shoppingCompanyFromQuery = companyImg.findIndex((item, i) => {
+      return item["type"] === parsed.site;
+    });
+    setClickShoppingCompany(shoppingCompanyFromQuery + 1);
   }, []);
   return (
     <Container>
@@ -42,17 +51,12 @@ const MainSection = () => {
           <Title>편성표 날짜 선택</Title>
           <DatePick>
             {dateRange.map((item, index) => {
-              //   if (parsed.date) {
-              //     todayToString(Number(parsed.date)) === item &&
-              //       console.log("item : ", item);
-              //   }
-
               if (item === dayjs().format("YYYY-MM-DD")) {
                 return (
                   <Date
+                    key={index}
                     clickDateIdx={clickDateIdx}
                     today
-                    key={index}
                     onClick={() => handleClickDate(item, index)}
                   >
                     {dayjs(item).format("M월D일 (오늘)")}
@@ -61,13 +65,38 @@ const MainSection = () => {
               }
               return (
                 <Date
+                  key={index}
                   clickDateIdx={clickDateIdx}
                   today={false}
-                  key={index}
                   onClick={() => handleClickDate(item, index)}
                 >
                   {dayjs(item).format("M월D일 (ddd)")}
                 </Date>
+              );
+            })}
+          </DatePick>
+          <Title>쇼핑사 선택 선택</Title>
+          <DatePick>
+            {companyImg.map((item, index) => {
+              if (Object.keys(item).includes("title")) {
+                return (
+                  <ShoppingCompany
+                    key={index}
+                    image={false}
+                    clickShoppingCompany={clickShoppingCompany}
+                    onClick={() => handleClickShoppingCompany(item.type, index)}
+                  >
+                    {item.title}
+                  </ShoppingCompany>
+                );
+              }
+              return (
+                <ShoppingCompany
+                  key={index}
+                  image={item.style}
+                  clickShoppingCompany={clickShoppingCompany}
+                  onClick={() => handleClickShoppingCompany(item.type, index)}
+                />
               );
             })}
           </DatePick>
@@ -111,11 +140,20 @@ type DateType = {
   today: boolean;
   clickDateIdx: number;
 };
-const Date = styled.div<DateType>`
+
+const BorderInDiv = css`
+  &:nth-child(3n + 1),
+  &:nth-child(3n + 2) {
+    border-right: 1px solid #eee;
+  }
+  border-bottom: 1px solid #eee;
+  width: 92px;
+  cursor: pointer;
   text-align: center;
+`;
+const Date = styled.div<DateType>`
   font-size: ${({ today }) => (today ? "13px" : "12px")};
   color: ${({ today }) => (today ? "#45ADA6" : "#000")};
-  cursor: pointer;
   ${({ clickDateIdx }) =>
     clickDateIdx &&
     `&:nth-child(${clickDateIdx}) {
@@ -124,11 +162,42 @@ const Date = styled.div<DateType>`
   }`};
 
   padding: 9px 0;
-  border-bottom: 1px solid #eee;
-  &:nth-child(3n + 1),
-  &:nth-child(3n + 2) {
-    border-right: 1px solid #eee;
-  }
-  width: 92px;
+  ${BorderInDiv}
+`;
+
+type ShoppingCompanyType = {
+  image: string | boolean | undefined;
+  clickShoppingCompany: number;
+};
+const ShoppingCompany = styled.div<ShoppingCompanyType>`
+  height: 38px;
+
+  ${BorderInDiv}
+  ${({ image }) =>
+    image
+      ? `background-image:url(${image})`
+      : `line-height : 38px; font-size:14px`};
+  background-size: 65px 25px;
+  background-repeat: no-repeat !important;
+  background-position: center;
+  position: relative;
+
+  ${({ clickShoppingCompany }) =>
+    clickShoppingCompany &&
+    `&:nth-child(${clickShoppingCompany}) {
+          &:after {
+            content: "";
+            width: 18px;
+            height: 18px;
+            background: url(http://hsmoa.com/media/img/mobile/check_mark_on.png)
+            no-repeat 50% 50%;
+            background-size: 18px 18px;
+            z-index: 9;
+            position: absolute;
+            right: 2px;
+            top: 2px;
+        }
+    background-color: #f5f5f5 !important;
+  }`};
 `;
 export default MainSection;

@@ -13,12 +13,16 @@ export const search_rank = [
 
 export const companyImg = [
   {
+    type: "",
+    title: "전체보기",
+  },
+  {
     type: "homeshopping",
-    style: "",
+    title: "홈쇼핑",
   },
   {
     type: "tcommerce2",
-    style: "",
+    title: "T커머스",
   },
   {
     type: "hnsmall",
