@@ -14,37 +14,64 @@ import Product from "./Product";
 import { getProductsFromMoa } from "./util/product";
 import { useAppDispatch, useAppSelector } from "../redux/configStore";
 import { setProduct, getProducts } from "../redux/modules/product";
+import { filterProducts } from "./util/filter";
 const MainSection = () => {
   const [dateRange, setDateRange] = useState<string[]>([]);
   const [clickDateIdx, setClickDateIdx] = useState<number>(0);
   const [clickShoppingCompany, setClickShoppingCompany] = useState<number>(0);
   const [clickCategory, setClickCategory] = useState<number>(0);
-
+  const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
+  const [filter, setFilter] = useState<any[]>([]);
   const dispatch = useAppDispatch();
   const products = useAppSelector(getProducts);
-  console.log("products : ", products);
+  const parsed = queryString.parse(window.location.search);
+
   const handleClickDate = (date: string, index: number) => {
     const noHypeDate = deleteHypenFromDate(date);
     setQueryStringParameter("date", noHypeDate);
     setClickDateIdx(index + 1);
     getProductsFromMoa(noHypeDate).then((result) => {
       dispatch(setProduct(result));
+      setFilteredProducts(result);
     });
   };
+
+  const handleFilter = (
+    company: string | null = null,
+    cate: string | null = null
+  ) => {
+    let newSCfilter: any[] = [];
+    if (company) {
+      let newF = filter.filter(
+        (item) => item[0].indexOf("shopping_company") === -1
+      );
+      if (company === "homeshopping" || company === "tcommerce2") {
+        newSCfilter = [...newF, ["shopping_kind", company]];
+      } else {
+        newSCfilter = [...newF, ["shopping_company", company]];
+      }
+    }
+    if (cate) {
+      let newF = filter.filter((item) => item[0].indexOf("category") === -1);
+      newSCfilter = [...newF, ["category", cate]];
+    }
+    setFilter([...newSCfilter]);
+    setFilteredProducts(filterProducts(products, [...newSCfilter]));
+  };
+
   const handleClickShoppingCompany = (company: string, index: number) => {
     setQueryStringParameter("site", company);
     setClickShoppingCompany(index + 1);
+    handleFilter(company, null);
   };
 
   const handleClickCategory = (cate: string, index: number) => {
     setQueryStringParameter("cate", cate);
     setClickCategory(index + 1);
+    handleFilter(null, cate);
   };
 
-  const setFilterIndexFromQueryString = (
-    newDateRange: string[],
-    parsed: queryString.ParsedQuery<string>
-  ) => {
+  const setFilterIndexFromQueryString = (newDateRange: string[]) => {
     if (parsed.date !== undefined) {
       const dateFromQuery =
         newDateRange.indexOf(todayToString(Number(parsed.date))) + 1;
@@ -65,20 +92,13 @@ const MainSection = () => {
   };
 
   useEffect(() => {
-    const aa = companyImg.find((item) => {
-      return item.type === "gsmyshop";
-    });
-    console.log("aa : ", aa?.style);
-    const parsed = queryString.parse(window.location.search);
-
-    // console.log(window.location.search);
     if (parsed.date !== null) {
       getProductsFromMoa(parsed.date as string).then((result) => {
         dispatch(setProduct(result));
+        setFilteredProducts(result);
       });
     }
 
-    console.log("dd  :");
     dayjs.locale("ko");
     let today = parseInt(dayjs().format("YYYYMMDD"));
     let newDateRange = Array.from({ length: 11 }, (v, i) =>
@@ -86,91 +106,101 @@ const MainSection = () => {
     );
     setDateRange(newDateRange);
 
-    setFilterIndexFromQueryString(newDateRange, parsed);
+    setFilterIndexFromQueryString(newDateRange);
   }, []);
 
   const testArray = Array.from({ length: 400 }, () => {});
 
-  return (
-    <Container>
-      <LeftSection>
-        {products.map((item, index) => (
-          <Product key={index} item={item}></Product>
-        ))}
-      </LeftSection>
-      <RightSection>
-        <RightSectionFixed>
-          <Title>편성표 날짜 선택</Title>
-          <DatePick>
-            {dateRange.map((item, index) => {
-              if (item === dayjs().format("YYYY-MM-DD")) {
+  if (filteredProducts.length === 0) {
+    return (
+      <div style={{ backgroundColor: "white", width: "100%" }}>
+        <img src="/images/loading.svg" alt="" />
+      </div>
+    );
+  } else {
+    return (
+      <Container>
+        <LeftSection>
+          {filteredProducts?.map((item: any, index: any) => (
+            <Product key={index} item={item}></Product>
+          ))}
+        </LeftSection>
+        <RightSection>
+          <RightSectionFixed>
+            <Title>편성표 날짜 선택</Title>
+            <DatePick>
+              {dateRange.map((item, index) => {
+                if (item === dayjs().format("YYYY-MM-DD")) {
+                  return (
+                    <Date
+                      key={index}
+                      clickDateIdx={clickDateIdx}
+                      today
+                      onClick={() => handleClickDate(item, index)}
+                    >
+                      {dayjs(item).format("M월D일 (오늘)")}
+                    </Date>
+                  );
+                }
                 return (
                   <Date
                     key={index}
                     clickDateIdx={clickDateIdx}
-                    today
+                    today={false}
                     onClick={() => handleClickDate(item, index)}
                   >
-                    {dayjs(item).format("M월D일 (오늘)")}
+                    {dayjs(item).format("M월D일 (ddd)")}
                   </Date>
                 );
-              }
-              return (
-                <Date
-                  key={index}
-                  clickDateIdx={clickDateIdx}
-                  today={false}
-                  onClick={() => handleClickDate(item, index)}
-                >
-                  {dayjs(item).format("M월D일 (ddd)")}
-                </Date>
-              );
-            })}
-          </DatePick>
-          <Title>쇼핑사 선택 선택</Title>
-          <DatePick>
-            {companyImg.map((item, index) => {
-              if (Object.keys(item).includes("title")) {
+              })}
+            </DatePick>
+            <Title>쇼핑사 선택 선택</Title>
+            <DatePick>
+              {companyImg.map((item, index) => {
+                if (Object.keys(item).includes("title")) {
+                  return (
+                    <ShoppingCompany
+                      key={index}
+                      image={false}
+                      clickShoppingCompany={clickShoppingCompany}
+                      onClick={() =>
+                        handleClickShoppingCompany(item.type, index)
+                      }
+                    >
+                      {item.title}
+                    </ShoppingCompany>
+                  );
+                }
                 return (
                   <ShoppingCompany
                     key={index}
-                    image={false}
+                    image={item.style}
                     clickShoppingCompany={clickShoppingCompany}
                     onClick={() => handleClickShoppingCompany(item.type, index)}
-                  >
-                    {item.title}
-                  </ShoppingCompany>
+                  />
                 );
-              }
-              return (
-                <ShoppingCompany
-                  key={index}
-                  image={item.style}
-                  clickShoppingCompany={clickShoppingCompany}
-                  onClick={() => handleClickShoppingCompany(item.type, index)}
-                />
-              );
-            })}
-          </DatePick>
-          <Title>카테고리 선택</Title>
+              })}
+            </DatePick>
+            <Title>카테고리 선택</Title>
 
-          <DatePick>
-            {categoryList.map(({ title, type }, index) => {
-              return (
-                <Category
-                  key={index}
-                  clickCategory={clickCategory}
-                  onClick={() => handleClickCategory(type, index)}
-                >
-                  {title}
-                </Category>
-              );
-            })}
-          </DatePick>
-        </RightSectionFixed>
-      </RightSection>
-    </Container>
-  );
+            <DatePick>
+              {categoryList.map(({ title, type }, index) => {
+                return (
+                  <Category
+                    key={index}
+                    clickCategory={clickCategory}
+                    onClick={() => handleClickCategory(type, index)}
+                  >
+                    {title}
+                  </Category>
+                );
+              })}
+            </DatePick>
+          </RightSectionFixed>
+        </RightSection>
+      </Container>
+    );
+  }
 };
 
 const Container = styled.div`

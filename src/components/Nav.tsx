@@ -1,11 +1,13 @@
 import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
+import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { search_rank } from "../data/data";
 const Nav = () => {
   const [searchBottom, setSearchBottom] = useState<string>("0%");
   const [rankPopShow, setRankPopShow] = useState<boolean>(false);
+  const history = useHistory();
   useEffect(() => {
     let index = 0;
     setInterval(() => {
@@ -18,7 +20,12 @@ const Nav = () => {
   return (
     <Container>
       <NavContainer>
-        <Logo />
+        <Logo
+          onClick={() => {
+            history.replace("/");
+            window.location.reload();
+          }}
+        />
         <SearchBox>
           <SearchInput placeholder="홈쇼핑 상품 검색" />
           <SearchIcon />
@@ -93,6 +100,7 @@ const Logo = styled.h1`
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
+  cursor: pointer;
 `;
 
 const SearchBox = styled.div`

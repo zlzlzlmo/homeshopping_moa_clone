@@ -5,7 +5,7 @@ import { companyImg } from "../../data/data";
 export const getProductsFromMoa = async (date: string | undefined) => {
   let shoppingList: any[] = [];
   const response = await axios
-    .get(`https://www.hsmoa.com/?date=${date}`)
+    .get(`https://www.hsmoa.com/${window.location.search}`)
     .then((html) => {
       const $ = cheerio.load(html.data);
       const bodyList = $(".timeline-group > div.timeline-item");
@@ -51,6 +51,7 @@ export const getProductsFromMoa = async (date: string | undefined) => {
             end: broadTime[1],
           },
           shopping_company: company,
+          shopping_kind: $(this).attr("class")?.split(" ")[3],
           company_logo: company_logo,
           category: $(this).attr("class")?.split(" ")[2],
         };

@@ -3,11 +3,16 @@ import styled from "styled-components";
 import Main from "./pages/Main";
 import axios from "axios";
 import cheerio from "cheerio";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 function App() {
   return (
-    <Container>
-      <Main />
-    </Container>
+    <Router>
+      <Container>
+        <Switch>
+          <Route exact path="/" component={Main} />
+        </Switch>
+      </Container>
+    </Router>
   );
 }
 
