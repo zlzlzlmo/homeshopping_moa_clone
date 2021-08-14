@@ -6,6 +6,7 @@ import "dayjs/locale/ko";
 import queryString from "query-string";
 import {
   deleteHypenFromDate,
+  getBroadcasting,
   setQueryStringParameter,
   todayToString,
 } from "./util/date";
@@ -15,7 +16,6 @@ import { getProductsFromMoa } from "./util/product";
 import { useAppDispatch, useAppSelector } from "../redux/configStore";
 import { setProduct, getProducts } from "../redux/modules/product";
 import { filterProducts } from "./util/filter";
-import { getSearchRank } from "./util/search_rank";
 
 import LinearProgress from "@material-ui/core/LinearProgress";
 import NoProduct from "./NoProduct";
@@ -111,7 +111,6 @@ const MainSection = () => {
   };
 
   useEffect(() => {
-    getSearchRank();
     let filterArray: any[] = [];
     if (parsed.cate !== undefined && parsed.cate !== "") {
       filterArray.push(["category", parsed.cate]);
@@ -192,7 +191,7 @@ const MainSection = () => {
                 );
               })}
             </DatePick>
-            <Title>쇼핑사 선택 선택</Title>
+            <Title>쇼핑사 선택</Title>
             <DatePick>
               {companyImg.map((item, index) => {
                 if (Object.keys(item).includes("title")) {

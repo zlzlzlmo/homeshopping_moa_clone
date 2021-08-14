@@ -13,9 +13,13 @@ const Product: React.FC<ProductProps> = ({ item }) => {
         <CompanyAndTimeBox>
           <img src={item.company_logo} alt="" />
           <span className="divider"> | </span>
-          <span className="time">
-            {item.time.start} ~ {item.time.end}
-          </span>
+          {item.is_broadcasting ? (
+            <span className="broadcasting">현재 방송중</span>
+          ) : (
+            <span className="time">
+              {item.time.start} ~ {item.time.end}
+            </span>
+          )}
         </CompanyAndTimeBox>
         <Title>{item.title}</Title>
         <Price>{item.price}</Price>
@@ -68,6 +72,10 @@ const CompanyAndTimeBox = styled.div`
   .divider {
     margin-left: 5px;
     margin-right: 5px;
+  }
+
+  .broadcasting {
+    color: red;
   }
 `;
 

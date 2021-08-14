@@ -1,11 +1,13 @@
 import axios from "axios";
 import cheerio from "cheerio";
 import { companyImg } from "../../data/data";
+import { getBroadcasting, todayToString } from "./date";
 
 export const getProductsFromMoa = async (date: string | undefined) => {
   let shoppingList: any[] = [];
+  let todayFormat: string = todayToString(Number(date));
   const response = await axios
-    .get(`https://www.hsmoa.com/${window.location.search}`)
+    .get(`https://www.hsmoa.com/?date=${date}`)
     .then((html) => {
       const $ = cheerio.load(html.data);
       const bodyList = $(".timeline-group > div.timeline-item");
@@ -50,11 +52,17 @@ export const getProductsFromMoa = async (date: string | undefined) => {
             start: broadTime[0],
             end: broadTime[1],
           },
+          is_broadcasting: getBroadcasting(
+            todayFormat,
+            broadTime[0],
+            broadTime[1]
+          ),
           shopping_company: company,
           shopping_kind: $(this).attr("class")?.split(" ")[3],
           company_logo: company_logo,
           category: $(this).attr("class")?.split(" ")[2],
         };
+
         shoppingList.push(object);
       });
       return shoppingList;
