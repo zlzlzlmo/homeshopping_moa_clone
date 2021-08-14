@@ -6,7 +6,7 @@ import "dayjs/locale/ko";
 import queryString from "query-string";
 import {
   deleteHypenFromDate,
-  getBroadcasting,
+  deleteQueryStringParameter,
   setQueryStringParameter,
   todayToString,
 } from "./util/date";
@@ -23,25 +23,56 @@ import NoProduct from "./NoProduct";
 const MainSection = () => {
   const [dateRange, setDateRange] = useState<string[]>([]);
   const [clickDateIdx, setClickDateIdx] = useState<number>(0);
-  const [clickShoppingCompany, setClickShoppingCompany] = useState<number>(0);
-  const [clickCategory, setClickCategory] = useState<number>(0);
+  const [clickShoppingCompany, setClickShoppingCompany] = useState<number>(1);
+  const [clickCategory, setClickCategory] = useState<number>(1);
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
   const [filter, setFilter] = useState<any[]>([]);
-
   const [loading, setLoading] = useState<boolean>(true);
+  const [showBeforeBroad, setShowBeforeBroad] = useState<boolean>(false);
+  const [beforeProducts, setBeforeProducts] = useState<any[]>([]);
   const dispatch = useAppDispatch();
   const products = useAppSelector(getProducts);
   const parsed = queryString.parse(window.location.search);
+  const today = parseInt(dayjs().format("YYYYMMDD"));
+  let filterArray: any[] = [];
+
+  const NotShowBeforeThisTime = (date: string, result: any) => {
+    if (date === undefined || date.replaceAll("-", "") === today.toString()) {
+      setShowBeforeBroad(true);
+      let index = result.findIndex(
+        (item: any) => item.is_broadcasting === true
+      );
+      let beforeProductArray = result.slice(0, index);
+      let newResult = result.slice(index);
+
+      setBeforeProducts(beforeProductArray);
+      dispatch(setProduct(newResult));
+      setFilteredProducts(filterProducts(newResult, [...filterArray]));
+    } else {
+      setShowBeforeBroad(false);
+      dispatch(setProduct(result));
+      setFilteredProducts(filterProducts(result, [...filterArray]));
+    }
+  };
+
+  const handleShowBeforePB = () => {
+    setShowBeforeBroad(false);
+    setFilteredProducts(
+      filterProducts([...beforeProducts, ...filteredProducts], [...filter])
+    );
+  };
 
   const handleClickDate = (date: string, index: number) => {
     setLoading(true);
-
     const noHypeDate = deleteHypenFromDate(date);
+    setClickCategory(1);
+    setClickShoppingCompany(1);
+    deleteQueryStringParameter("site");
+    deleteQueryStringParameter("cate");
     setQueryStringParameter("date", noHypeDate);
     setClickDateIdx(index + 1);
     getProductsFromMoa(noHypeDate).then((result) => {
-      dispatch(setProduct(result));
-      setFilteredProducts(result);
+      NotShowBeforeThisTime(date, result);
       setLoading(false);
     });
   };
@@ -50,6 +81,7 @@ const MainSection = () => {
     company: string | null = null,
     cate: string | null = null
   ) => {
+    setShowBeforeBroad(true);
     let newSCfilter: any[] = [];
     if (company || company === "") {
       let newF = filter.filter(
@@ -107,11 +139,11 @@ const MainSection = () => {
     const categoryFromQuery = categoryList.findIndex((item, i) => {
       return item["type"] === parsed.cate;
     });
+
     setClickCategory(categoryFromQuery + 1);
   };
 
   useEffect(() => {
-    let filterArray: any[] = [];
     if (parsed.cate !== undefined && parsed.cate !== "") {
       filterArray.push(["category", parsed.cate]);
     }
@@ -123,23 +155,20 @@ const MainSection = () => {
       }
     }
 
-    setFilter(filterArray);
-
     if (parsed.date !== null) {
       getProductsFromMoa(parsed.date as string).then((result) => {
-        dispatch(setProduct(result));
-        setFilteredProducts(filterProducts(result, [...filterArray]));
+        NotShowBeforeThisTime(parsed.date as string, result);
         setLoading(false);
       });
     }
 
     dayjs.locale("ko");
-    let today = parseInt(dayjs().format("YYYYMMDD"));
     let newDateRange = Array.from({ length: 11 }, (v, i) =>
       todayToString(today + i - 5)
     );
-    setDateRange(newDateRange);
 
+    setFilter(filterArray);
+    setDateRange(newDateRange);
     setFilterIndexFromQueryString(newDateRange);
   }, []);
 
@@ -156,6 +185,14 @@ const MainSection = () => {
           <NoProduct />
         ) : (
           <LeftSection>
+            {showBeforeBroad && (
+              <div>
+                <ShowBeforeBroadBtn onClick={() => handleShowBeforePB()}>
+                  이전방송 보기
+                </ShowBeforeBroadBtn>
+              </div>
+            )}
+
             {filteredProducts?.map((item: any, index: any) => (
               <Product key={index} item={item}></Product>
             ))}
@@ -246,6 +283,19 @@ const Container = styled.div`
   margin: 0 auto;
   display: flex;
   justify-content: flex-end;
+`;
+
+const ShowBeforeBroadBtn = styled.div`
+  cursor: pointer;
+  width: 200px;
+  line-height: 35px;
+  color: #fff;
+  text-align: center;
+  margin: auto;
+  font-size: 14px;
+  font-weight: bolder;
+  background-color: #f25862;
+  margin-bottom: 10px;
 `;
 
 const LeftSection = styled.section`

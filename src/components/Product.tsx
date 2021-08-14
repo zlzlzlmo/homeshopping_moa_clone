@@ -7,6 +7,17 @@ const Product: React.FC<ProductProps> = ({ item }) => {
   return (
     <Container>
       <ImageBox>
+        {item.is_broadcasting && (
+          <>
+            <LiveTxt>LIVE</LiveTxt>
+            <img
+              className="play_btn"
+              src="http://hsmoa.com/media/img/2016/timeline_dot_play.png"
+              alt=""
+            />
+          </>
+        )}
+
         <img src={item.image} alt="/" />
       </ImageBox>
       <ContentBox>
@@ -41,13 +52,37 @@ const Container = styled.div`
   }
 `;
 
+const LiveTxt = styled.div`
+  background: #f84343;
+  color: #fff;
+  padding: 3px 6px;
+  font-size: 10px;
+  border-radius: 0 0 2px 0;
+  width: 32px;
+  height: 18px;
+  box-sizing: border-box;
+  position: absolute;
+  left: 0;
+  top: 0;
+`;
+
 const ImageBox = styled.div`
   width: 130px;
   height: 100%;
+  position: relative;
   img {
     display: inline-block;
-    width: 100%;
+    width: 130px;
     height: 100%;
+  }
+  .play_btn {
+    z-index: 1;
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
   }
 `;
 

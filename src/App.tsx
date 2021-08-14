@@ -1,8 +1,5 @@
-import React, { useEffect } from "react";
 import styled from "styled-components";
 import Main from "./pages/Main";
-import axios from "axios";
-import cheerio from "cheerio";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 function App() {
   return (

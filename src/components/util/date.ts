@@ -25,6 +25,16 @@ export const setQueryStringParameter = (name: string, value: string) => {
   );
 };
 
+export const deleteQueryStringParameter = (name: any) => {
+  const params = new URLSearchParams(window.location.search);
+  params.delete(name);
+  window.history.replaceState(
+    {},
+    "",
+    decodeURIComponent(`${window.location.pathname}?${params}`)
+  );
+};
+
 class ExtractHourAndMin {
   time = "";
   hourIdx = 0;
@@ -38,7 +48,6 @@ class ExtractHourAndMin {
     return Number(this.time.slice(0, this.hourIdx));
   }
   getMin() {
-    let MinIdx = this.time.indexOf("분");
     return Number(this.time.slice(this.hourIdx + 1, this.minIdx));
   }
 }
