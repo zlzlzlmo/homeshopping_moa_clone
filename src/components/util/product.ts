@@ -13,7 +13,6 @@ export const getProductsFromMoa = async (date: string | undefined) => {
       const bodyList = $(".timeline-group > div.timeline-item");
       bodyList.each(function (i, elem) {
         let company = $(this).attr("class")?.split(" ")[1];
-
         let company_logo = companyImg.find((item) => {
           return item.type === company;
         })?.style;
@@ -61,6 +60,7 @@ export const getProductsFromMoa = async (date: string | undefined) => {
           shopping_kind: $(this).attr("class")?.split(" ")[3],
           company_logo: company_logo,
           category: $(this).attr("class")?.split(" ")[2],
+          link: $(this).children("a").attr("href"),
         };
 
         shoppingList.push(object);

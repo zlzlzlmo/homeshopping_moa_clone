@@ -1,11 +1,17 @@
 import React from "react";
+import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 interface ProductProps {
   item: any;
 }
 const Product: React.FC<ProductProps> = ({ item }) => {
+  const history = useHistory();
   return (
-    <Container>
+    <Container
+      onClick={() =>
+        (window.location.href = `https://www.hsmoa.com/${item.link}`)
+      }
+    >
       <ImageBox>
         {item.is_broadcasting && (
           <>
