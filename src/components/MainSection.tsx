@@ -15,6 +15,11 @@ import { getProductsFromMoa } from "./util/product";
 import { useAppDispatch, useAppSelector } from "../redux/configStore";
 import { setProduct, getProducts } from "../redux/modules/product";
 import { filterProducts } from "./util/filter";
+import { getSearchRank } from "./util/search_rank";
+
+import LinearProgress from "@material-ui/core/LinearProgress";
+import NoProduct from "./NoProduct";
+
 const MainSection = () => {
   const [dateRange, setDateRange] = useState<string[]>([]);
   const [clickDateIdx, setClickDateIdx] = useState<number>(0);
@@ -22,17 +27,22 @@ const MainSection = () => {
   const [clickCategory, setClickCategory] = useState<number>(0);
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
   const [filter, setFilter] = useState<any[]>([]);
+
+  const [loading, setLoading] = useState<boolean>(true);
   const dispatch = useAppDispatch();
   const products = useAppSelector(getProducts);
   const parsed = queryString.parse(window.location.search);
 
   const handleClickDate = (date: string, index: number) => {
+    setLoading(true);
+
     const noHypeDate = deleteHypenFromDate(date);
     setQueryStringParameter("date", noHypeDate);
     setClickDateIdx(index + 1);
     getProductsFromMoa(noHypeDate).then((result) => {
       dispatch(setProduct(result));
       setFilteredProducts(result);
+      setLoading(false);
     });
   };
 
@@ -101,6 +111,7 @@ const MainSection = () => {
   };
 
   useEffect(() => {
+    getSearchRank();
     let filterArray: any[] = [];
     if (parsed.cate !== undefined && parsed.cate !== "") {
       filterArray.push(["category", parsed.cate]);
@@ -119,6 +130,7 @@ const MainSection = () => {
       getProductsFromMoa(parsed.date as string).then((result) => {
         dispatch(setProduct(result));
         setFilteredProducts(filterProducts(result, [...filterArray]));
+        setLoading(false);
       });
     }
 
@@ -132,22 +144,25 @@ const MainSection = () => {
     setFilterIndexFromQueryString(newDateRange);
   }, []);
 
-  const testArray = Array.from({ length: 400 }, () => {});
-
-  if (filteredProducts.length === 0) {
+  if (loading) {
     return (
       <div style={{ backgroundColor: "white", width: "100%" }}>
-        <img src="/images/loading.svg" alt="" />
+        <LinearProgress />
       </div>
     );
   } else {
     return (
       <Container>
-        <LeftSection>
-          {filteredProducts?.map((item: any, index: any) => (
-            <Product key={index} item={item}></Product>
-          ))}
-        </LeftSection>
+        {filteredProducts.length === 0 ? (
+          <NoProduct />
+        ) : (
+          <LeftSection>
+            {filteredProducts?.map((item: any, index: any) => (
+              <Product key={index} item={item}></Product>
+            ))}
+          </LeftSection>
+        )}
+
         <RightSection>
           <RightSectionFixed>
             <Title>편성표 날짜 선택</Title>
@@ -231,23 +246,23 @@ const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
+  justify-content: flex-end;
 `;
 
 const LeftSection = styled.section`
   padding-top: 20px;
+  margin-right: 200px;
 `;
 const RightSection = styled.section`
-  margin-left: auto;
   width: 311px;
   height: 100vh;
-  border-left: 1px solid #ddd;
   position: relative;
+  border-left: 1px solid #ddd;
 `;
 
 const RightSectionFixed = styled.div`
-  position: sticky;
+  position: fixed;
   padding: 14px 16px;
-  right: 0;
   top: 76px;
 `;
 
