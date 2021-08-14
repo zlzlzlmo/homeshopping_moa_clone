@@ -66,10 +66,18 @@ export const getBroadcasting = (
   let endHour = endTime.getHour();
   let endMin = endTime.getMin();
 
-  // if (todayFormat === todayJs && startHour <= nowHour && nowHour <= endHour) {
-  //   if (nowMin <= endMin) {
-  //     return true;
-  //   }
-  // }
+  if (todayFormat === todayJs) {
+    if (startHour === nowHour) {
+      if (startMin <= nowMin) {
+        return true;
+      }
+    }
+
+    if (endHour === nowHour) {
+      if (nowMin <= endMin) {
+        return true;
+      }
+    }
+  }
   return false;
 };
