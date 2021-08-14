@@ -41,19 +41,28 @@ const MainSection = () => {
     cate: string | null = null
   ) => {
     let newSCfilter: any[] = [];
-    if (company) {
+    if (company || company === "") {
       let newF = filter.filter(
-        (item) => item[0].indexOf("shopping_company") === -1
+        (item) =>
+          item[0].indexOf("shopping_company") === -1 &&
+          item[0].indexOf("shopping_kind") === -1
       );
-      if (company === "homeshopping" || company === "tcommerce2") {
+      if (company === "") {
+        newSCfilter = [...newF];
+      } else if (company === "homeshopping" || company === "tcommerce2") {
         newSCfilter = [...newF, ["shopping_kind", company]];
       } else {
         newSCfilter = [...newF, ["shopping_company", company]];
       }
     }
-    if (cate) {
+
+    if (cate || cate === "") {
       let newF = filter.filter((item) => item[0].indexOf("category") === -1);
-      newSCfilter = [...newF, ["category", cate]];
+      if (cate === "") {
+        newSCfilter = [...newF];
+      } else {
+        newSCfilter = [...newF, ["category", cate]];
+      }
     }
     setFilter([...newSCfilter]);
     setFilteredProducts(filterProducts(products, [...newSCfilter]));
@@ -92,10 +101,24 @@ const MainSection = () => {
   };
 
   useEffect(() => {
+    let filterArray: any[] = [];
+    if (parsed.cate !== undefined && parsed.cate !== "") {
+      filterArray.push(["category", parsed.cate]);
+    }
+    if (parsed.site !== undefined && parsed.site !== "") {
+      if (parsed.site === "homeshopping" || parsed.site === "tcommerce2") {
+        filterArray.push(["shopping_kind", parsed.site]);
+      } else {
+        filterArray.push(["shopping_company", parsed.site]);
+      }
+    }
+
+    setFilter(filterArray);
+
     if (parsed.date !== null) {
       getProductsFromMoa(parsed.date as string).then((result) => {
         dispatch(setProduct(result));
-        setFilteredProducts(result);
+        setFilteredProducts(filterProducts(result, [...filterArray]));
       });
     }
 
