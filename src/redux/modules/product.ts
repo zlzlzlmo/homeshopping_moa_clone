@@ -1,12 +1,28 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../configStore";
 
-const initialState: any[] = [];
+interface Time {
+  start: string;
+  end: string;
+}
+export interface ProductState {
+  title: string;
+  image: string;
+  price: string;
+  time: Time;
+  is_broadcasting: boolean;
+  shopping_company: string;
+  shopping_kind: string;
+  company_logo: string;
+  category: string;
+  link: string;
+}
+const initialState: ProductState[] = [];
 const productSlice = createSlice({
   name: "product",
   initialState,
   reducers: {
-    setProduct: (state, action) => {
+    setProduct: (state, action: PayloadAction<ProductState[]>) => {
       return action.payload;
     },
   },

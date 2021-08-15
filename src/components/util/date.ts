@@ -25,7 +25,7 @@ export const setQueryStringParameter = (name: string, value: string) => {
   );
 };
 
-export const deleteQueryStringParameter = (name: any) => {
+export const deleteQueryStringParameter = (name: string) => {
   const params = new URLSearchParams(window.location.search);
   params.delete(name);
   window.history.replaceState(

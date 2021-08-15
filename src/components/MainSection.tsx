@@ -14,9 +14,12 @@ import { categoryList, companyImg } from "../data/data";
 import Product from "./Product";
 import { getProductsFromMoa } from "./util/product";
 import { useAppDispatch, useAppSelector } from "../redux/configStore";
-import { setProduct, getProducts } from "../redux/modules/product";
+import {
+  setProduct,
+  getProducts,
+  ProductState,
+} from "../redux/modules/product";
 import { filterProducts } from "./util/filter";
-
 import LinearProgress from "@material-ui/core/LinearProgress";
 import NoProduct from "./NoProduct";
 
@@ -25,22 +28,22 @@ const MainSection = () => {
   const [clickDateIdx, setClickDateIdx] = useState<number>(0);
   const [clickShoppingCompany, setClickShoppingCompany] = useState<number>(1);
   const [clickCategory, setClickCategory] = useState<number>(1);
-  const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
-  const [filter, setFilter] = useState<any[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<ProductState[]>([]);
+  const [filter, setFilter] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [showBeforeBroad, setShowBeforeBroad] = useState<boolean>(false);
-  const [beforeProducts, setBeforeProducts] = useState<any[]>([]);
+  const [beforeProducts, setBeforeProducts] = useState<ProductState[]>([]);
   const dispatch = useAppDispatch();
   const products = useAppSelector(getProducts);
   const parsed = queryString.parse(window.location.search);
   const today = parseInt(dayjs().format("YYYYMMDD"));
   let filterArray: any[] = [];
 
-  const NotShowBeforeThisTime = (date: string, result: any) => {
+  const NotShowBeforeThisTime = (date: string, result: ProductState[]) => {
     if (date === undefined || date.replaceAll("-", "") === today.toString()) {
       setShowBeforeBroad(true);
       let index = result.findIndex(
-        (item: any) => item.is_broadcasting === true
+        (item: ProductState) => item.is_broadcasting === true
       );
       let beforeProductArray = result.slice(0, index);
       let newResult = result.slice(index);
