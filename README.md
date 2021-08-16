@@ -213,6 +213,17 @@ export const setQueryStringParameter = (name: string, value: string) => {
 
 - 필터 클릭시 해당 필터 name value를 url로 파싱( 새로 고침시 필터 유지를 위함 )
 
+### 6. 현재 날짜 기준에서 전 후 5일 범위를 만들어 날짜 필터에 적용 (날짜가 바뀌어도 자동으로 날짜 필터의 날짜 업데이트)
+
+```ts
+dayjs.locale("ko");
+const today = parseInt(dayjs().format("YYYYMMDD"));
+let newDateRange = Array.from({ length: 11 }, (v, i) =>
+  todayToString(today + i - 5)
+);
+setDateRange(newDateRange);
+```
+
 ---
 
 😎 감사합니다 :)
